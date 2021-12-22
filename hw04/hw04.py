@@ -118,10 +118,11 @@ def balanced(m):
     True
     """
     "*** YOUR CODE HERE ***"
-    if total_weight(left(m)[1:]) * length(left(m)) == total_weight(right(m)[1:]) * length(right(m)):
+    if is_planet(m):
         return True
-    else:
-        return False
+    return total_weight(end(left(m))) * length(left(m)) == total_weight(end(right(m))) * length(right(m)) \
+            and balanced(end(left(m))) and balanced(end(right(m)))
+
 
 def totals_tree(m):
     """Return a tree representing the mobile with its total weight at the root.
@@ -153,7 +154,10 @@ def totals_tree(m):
     True
     """
     "*** YOUR CODE HERE ***"
-
+    if is_planet(m):
+        return tree(total_weight(m))
+    else:
+        return tree(total_weight(m),[totals_tree(end(left(m))),totals_tree(end(right(m)))])
 
 def replace_loki_at_leaf(t, lokis_replacement):
     """Returns a new tree where every leaf value equal to "loki" has
@@ -185,7 +189,14 @@ def replace_loki_at_leaf(t, lokis_replacement):
     True
     """
     "*** YOUR CODE HERE ***"
-
+    new_tree = copy_tree(t)
+    for tr in new_tree:
+        if is_leaf(tr):
+            if label(tr) == 'loki':
+                tr[0] = lokis_replacement
+        elif is_tree(tr):
+            tr[:] = replace_loki_at_leaf(tr, lokis_replacement)
+    return new_tree
 
 def has_path(t, word):
     """Return whether there is a path in a tree where the entries along the path
@@ -219,6 +230,14 @@ def has_path(t, word):
     """
     assert len(word) > 0, 'no path for empty word.'
     "*** YOUR CODE HERE ***"
+    if label(t)!=word[0]:  #不仅完成了排除开头的根节点，还与for循环一同完成了节点的切换
+        return False
+    elif label(t) == word:
+        return True
+    for b in branches(t):
+        if has_path(b,word[1:]):
+            return True
+    return False
 
 
 def preorder(t):
@@ -232,7 +251,12 @@ def preorder(t):
     [2, 4, 6]
     """
     "*** YOUR CODE HERE ***"
-
+    if is_leaf(t):
+        return [label(t)]
+    lst = []
+    for b in branches(t):
+        lst += preorder(b)
+    return [label(t)] + lst
 
 def str_interval(x):
     """Return a string representation of interval x."""
