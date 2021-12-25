@@ -28,8 +28,13 @@ def insert_items(lst, entry, elem):
     True
     """
     "*** YOUR CODE HERE ***"
-
-
+    i = 0
+    while i < len(lst):
+        if lst[i] == entry:
+            lst.insert(i+1,elem)
+            i+=1
+        i+=1
+    return lst
 def count_occurrences(t, n, x):
     """Return the number of times that x appears in the first n elements of iterator t.
 
@@ -51,7 +56,11 @@ def count_occurrences(t, n, x):
     2
     """
     "*** YOUR CODE HERE ***"
-
+    count = 0
+    for i in range(n):
+        if next(t) == x:
+            count +=1
+    return count
 
 def repeated(t, k):
     """Return the first value in iterator T that appears K times in a row.
@@ -76,3 +85,15 @@ def repeated(t, k):
     """
     assert k > 1
     "*** YOUR CODE HERE ***"
+    if 'last_item' not in locals():
+        last_item = None
+    count = 0
+    while True:
+        item = next(t)
+        if item == last_item:
+            count +=1
+        else:
+            last_item = item
+            count = 0
+        if count == k-1:
+            return item
