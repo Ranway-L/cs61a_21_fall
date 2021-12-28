@@ -21,8 +21,13 @@ def gen_perms(seq):
     [['a', 'b'], ['b', 'a']]
     """
     "*** YOUR CODE HERE ***"
-
-
+    seq = list(seq)  #保证输入为list形式，去掉改行会报 TypeError: can only concatenate tuple (not "list") to tuple
+    if len(seq) == 1:
+         yield seq
+    else:                           # else不能省略！
+        for each_perm in gen_perms(seq[1:]):     #此处each_perm得到的是gen_perms()迭代器返回的seq
+            for i in range(len(seq)):     #将第一个元素在所有位置进行插入
+                yield each_perm[:i] + [seq[0]] + each_perm[i:]
 def path_yielder(t, value):
     """Yields all possible paths from the root of t to a node with the label
     value as a list.
@@ -58,10 +63,13 @@ def path_yielder(t, value):
     [[0, 2], [0, 2, 1, 2]]
     """
     "*** YOUR CODE HERE ***"
-    for _______________ in _________________:
-        for _______________ in _________________:
+    if t.label == value:
+        yield [t.label]
+    #此处不能有else！     如果加了else就是局部搜索，不加else是全局搜索
+    for branch in t.branches:
+        for path in path_yielder(branch,value):   #此处path与path_yielder()迭代器返回的label数据类型相一致
             "*** YOUR CODE HERE ***"
-
+            yield [t.label] + path                  #此处path是返回的量，t.label是此刻的label
 
 def preorder(t):
     """Return a list of the entries in this tree in the order that they
@@ -74,6 +82,13 @@ def preorder(t):
     [2, 4, 6]
     """
     "*** YOUR CODE HERE ***"
+    lst = []
+    if t.is_leaf():
+        return [t.label]
+    for branch in t.branches:
+        #lst.append(preorder(branch))     #append方法和 +=对list作用是不同的
+        lst += preorder(branch)
+    return [t.label] + lst
 
 
 def generate_preorder(t):
@@ -88,7 +103,8 @@ def generate_preorder(t):
     [2, 3, 4, 5, 6, 7]
     """
     "*** YOUR CODE HERE ***"
-
+    rt = iter(list(preorder(t)))
+    yield from rt
 
 def remainders_generator(m):
     """
