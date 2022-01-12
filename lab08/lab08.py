@@ -49,10 +49,10 @@ def label_squarer(t):
     # print('DEBUG: t:',t.__repr__())
 
     # easy method
-    # assert isinstance(t, Tree)
-    # t.label = t.label**2
-    # for b in t.branches:
-    #     label_squarer(b)
+    assert isinstance(t, Tree)
+    t.label = t.label**2
+    for b in t.branches:
+        label_squarer(b)
 
 def cumulative_mul(t):
     """Mutates t so that each node's label becomes the product of all labels in
@@ -64,8 +64,19 @@ def cumulative_mul(t):
     Tree(105, [Tree(15, [Tree(5)]), Tree(7)])
     """
     "*** YOUR CODE HERE ***"
-
-
+    assert isinstance(t, Tree), 't must be a Tree instance!'
+    for b in t.branches:
+        cumulative_mul(b)
+    total = t.label
+    for b in t.branches:
+        total *= b.label
+        t.label = total
+    # short version
+    # total = t.label
+    # for b in t.branches:
+    #     cumulative_mul(b)
+    #     total *= b.label
+    #     t.label = total
 def add_d_leaves(t, v):
     """Add d leaves containing v to each node at every depth d.
 
@@ -125,7 +136,11 @@ def add_d_leaves(t, v):
         10
     """
     "*** YOUR CODE HERE ***"
-
+    def record_depth(t,depth):
+        for b in t.branches:
+            record_depth(b, depth+1)
+        t.branches.extend([Tree(v) for _ in range(depth)])
+    record_depth(t,0)
 
 def every_other(s):
     """Mutates a linked list so that all the odd-indiced elements are removed
