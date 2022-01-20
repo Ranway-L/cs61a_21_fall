@@ -36,7 +36,36 @@ class VendingMachine:
     'Here is your soda.'
     """
     "*** YOUR CODE HERE ***"
+    def __init__(self,name,price,stock = 0,fund = 0):
+        self.name = name
+        self.price = price
+        self.stock = stock
+        self.fund = fund
+    def vend(self):
+        if self.stock == 0:
+            return 'Nothing left to vend. Please restock.'
+        if self.stock > 0 and self.fund < self.price:
+            return f'You must add ${self.price - self.fund} more funds.'
+        if self.stock > 0 and self.fund == self.price:
+            self.fund = 0
+            self.stock -= 1
+            return f'Here is your {self.name}.'
+        if self.stock > 0 and self.fund > self.price:
+            extra_money = self.fund - self.price
+            self.fund = 0
+            self.stock -= 1
+            return f'Here is your {self.name} and ${extra_money} change.'
+    def add_funds(self,fund):
+        self.fund += fund
+        if self.stock == 0:
+            self.fund -= fund
+            return f'Nothing left to vend. Please restock. Here is your ${fund}.'
+        if self.stock > 0:
+            return f'Current balance: ${self.fund}'
 
+    def restock(self,stock_number):
+        self.stock += stock_number
+        return f'Current {self.name} stock: {self.stock}'
 
 class Mint:
     """A mint creates coins by stamping on years.
@@ -74,10 +103,12 @@ class Mint:
 
     def create(self, kind):
         "*** YOUR CODE HERE ***"
-
+        temp = kind(self.year)
+        temp.year = self.year
+        return temp
     def update(self):
         "*** YOUR CODE HERE ***"
-
+        self.year = Mint.present_year
 
 class Coin:
     def __init__(self, year):
@@ -85,8 +116,10 @@ class Coin:
 
     def worth(self):
         "*** YOUR CODE HERE ***"
-
-
+        if Mint.present_year - self.year >= 50:
+            return self.cents + Mint.present_year - self.year - 50
+        else:
+            return self.cents
 class Nickel(Coin):
     cents = 5
 
@@ -112,6 +145,11 @@ def store_digits(n):
     >>> link1 = Link(3, Link(Link(4), Link(5, Link(6))))
     """
     "*** YOUR CODE HERE ***"
+    a = Link(n % 10)
+    while n >= 10:
+        n = n // 10
+        a = Link(n % 10,a)
+    return a
 
 
 def deep_map_mut(fn, link):
@@ -132,7 +170,16 @@ def deep_map_mut(fn, link):
     <9 <16> 25 36>
     """
     "*** YOUR CODE HERE ***"
-
+    while link != Link.empty:                #直接用本行做判断，不要用link.rest != Link.empty来判断
+        print('DEBUG: link.first', link.first)
+        if isinstance(link.first, Link):
+            print('DEBUG: another function', link.first)
+            deep_map_mut(fn,link.first)
+            print('DEBUG: back to last function', link.first)
+        else:
+            link.first = fn(link.first)
+        print('DEBUG: Now link.first', link.first)
+        link = link.rest
 
 def two_list(vals, amounts):
     """
@@ -154,7 +201,32 @@ def two_list(vals, amounts):
     Link(1, Link(1, Link(3, Link(3, Link(2)))))
     """
     "*** YOUR CODE HERE ***"
+    # Iterative
+    # link = Link(None)
+    # a = link
+    # vals = vals[:]
+    # amounts = amounts[:]
+    # while True:
+    #     if vals ==[] or amounts == []:
+    #         return a
+    #     while amounts[0] > 0:
+    #         link.first = vals[0]
+    #         if len(amounts) == 1 and amounts[0] == 1:
+    #             link.rest = Link.empty
+    #         else:
+    #             link.rest = Link(None)
+    #         link = link.rest
+    #         amounts[0] -= 1
+    #     vals.pop(0)
+    #     amounts.pop(0)
 
+    # recursive
+    if amounts ==[]:
+        return Link.empty
+    if amounts[0] == 0:
+        return two_list(vals[1:],amounts[1:])
+    amounts[0] -= 1
+    return Link(vals[0],two_list(vals,amounts))
 
 class VirFib():
     """A Virahanka Fibonacci number.
